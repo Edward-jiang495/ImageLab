@@ -22,11 +22,12 @@ using namespace cv;
 
 @implementation OpenCVBridge
 
+NSInteger numFrames = 0;
 
 
 #pragma mark ===Write Your Code Here===
 // alternatively you can subclass this class and override the process image function
--(bool)processFinger{
+-(bool)processFinger: (double *) R G:(double *) G B:(double *) B{
     
     cv::Mat frame_gray,image_copy;
     char text[50];
@@ -39,17 +40,30 @@ using namespace cv;
     //    after testing with rgb table, the correct order should be egb not bgr
     //    sprintf(text,"Avg. B: %.0f, G: %.0f, R: %.0f", avgPixelIntensity.val[0],avgPixelIntensity.val[1],avgPixelIntensity.val[2]);
     sprintf(text,"Avg. R: %.0f, G: %.0f, B: %.0f", avgPixelIntensity.val[0], avgPixelIntensity.val[1], avgPixelIntensity.val[2]);
+    
+    
     cv::putText(_image, text, cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+    
+    numFrames += 1;
+    if(numFrames == 100){
+        cv::putText(_image, "100 Frames Captured", cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+    }
     
     // if dark
     if (avgPixelIntensity.val[0] < 60 && avgPixelIntensity.val[1] < 10 && avgPixelIntensity.val[2] < 10)
     {
+        R = avgPixelIntensity.val[0];
+        G = avgPixelIntensity.val[1];
+        B = avgPixelIntensity.val[2];
         return true;
     }
     
     // or if red
     else if (avgPixelIntensity.val[0] > 180 && avgPixelIntensity.val[1] < 10 && avgPixelIntensity.val[2] < 10)
     {
+        R = avgPixelIntensity.val[0];
+        G = avgPixelIntensity.val[1];
+        B = avgPixelIntensity.val[2];
         return true;
     }
     
