@@ -26,7 +26,42 @@ using namespace cv;
 
 #pragma mark ===Write Your Code Here===
 // alternatively you can subclass this class and override the process image function
-
+-(bool)processFinger{
+    
+//    these code copied from case 3,
+    //this is the only function that uses cv puttext
+//    bgr
+    cv::Mat frame_gray,image_copy;
+    char text[50];
+    Scalar avgPixelIntensity;
+    
+    cvtColor(_image, image_copy, CV_BGRA2BGR); // get rid of alpha for processing
+    avgPixelIntensity = cv::mean( image_copy );
+//    the original code was below
+//    after testing with rgb table, the correct order should be egb not bgr
+//    sprintf(text,"Avg. B: %.0f, G: %.0f, R: %.0f", avgPixelIntensity.val[0],avgPixelIntensity.val[1],avgPixelIntensity.val[2]);
+    sprintf(text,"Avg. R: %.0f, G: %.0f, B: %.0f", avgPixelIntensity.val[0],avgPixelIntensity.val[1],avgPixelIntensity.val[2]);
+    cv::putText(_image, text, cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+    if(avgPixelIntensity.val[0] > 40 && avgPixelIntensity.val[0] < 90){
+        //data on a iphone 7, maybe different on different models
+        cv::putText(_image, "finger", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+        return true;
+        
+    }
+    else if(avgPixelIntensity.val[0] > 240 && avgPixelIntensity.val[0] < 255){
+        //data on a iphone 7, maybe different on different models
+        cv::putText(_image, "finger", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+        return true;
+        
+    }
+       
+    else{
+        cv::putText(_image, "no finger", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+        return false;
+        
+    }
+        
+}
 
 #pragma mark Define Custom Functions Here
 -(void)processImage{
@@ -252,6 +287,8 @@ using namespace cv;
             
     }
 }
+
+
 
 
 #pragma mark ====Do Not Manipulate Code below this line!====
