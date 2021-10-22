@@ -23,12 +23,15 @@ using namespace cv;
 @implementation OpenCVBridge
 
 NSInteger numFrames = 0;
+NSMutableArray *r = [[NSMutableArray alloc] initWithCapacity:100];
+NSMutableArray *g = [[NSMutableArray alloc] initWithCapacity:100];
+NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:100];
 
 
 #pragma mark ===Write Your Code Here===
 // alternatively you can subclass this class and override the process image function
--(bool)processFinger: (double *) R G:(double *) G B:(double *) B{
-    
+-(bool)processFinger{
+
     cv::Mat frame_gray,image_copy;
     char text[50];
     Scalar avgPixelIntensity;
@@ -44,26 +47,34 @@ NSInteger numFrames = 0;
     
     cv::putText(_image, text, cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
     
-    numFrames += 1;
-    if(numFrames == 100){
-        cv::putText(_image, "100 Frames Captured", cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+    if(numFrames >= 100){
+        cv::putText(_image, "100 Frames Captured", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
     }
     
     // if dark
-    if (avgPixelIntensity.val[0] < 60 && avgPixelIntensity.val[1] < 10 && avgPixelIntensity.val[2] < 10)
+    if (avgPixelIntensity.val[0] < 60 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 20)
     {
-        R = avgPixelIntensity.val[0];
-        G = avgPixelIntensity.val[1];
-        B = avgPixelIntensity.val[2];
+        if(numFrames < 100){
+            numFrames += 1;
+            [r addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[0]]];
+            [g addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[1]]];
+            [b addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[2]]];
+        }
+        
         return true;
     }
     
     // or if red
-    else if (avgPixelIntensity.val[0] > 180 && avgPixelIntensity.val[1] < 10 && avgPixelIntensity.val[2] < 10)
+    else if (avgPixelIntensity.val[0] > 143 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 40)
     {
-        R = avgPixelIntensity.val[0];
-        G = avgPixelIntensity.val[1];
-        B = avgPixelIntensity.val[2];
+        if(numFrames < 100){
+            numFrames += 1;
+            [r addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[0]]];
+            [g addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[1]]];
+            [b addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[2]]];
+
+        }
+                
         return true;
     }
     
@@ -418,7 +429,7 @@ NSInteger numFrames = 0;
                                         8 * _image.elemSize(),                           // Bits per pixel
                                         _image.step[0],                                  // Bytes per row
                                         colorSpace,                                     // Colorspace
-                                        kCGImageAlphaNone | kCGBitmapByteOrderDefault,  // Bitmap info flags
+                                        kCGImageAlphaNoneSkipLast | kCGBitmapByteOrderDefault,  // Bitmap info flags
                                         provider,                                       // CGDataProviderRef
                                         NULL,                                           // Decode
                                         false,                                          // Should interpolate
@@ -462,7 +473,7 @@ NSInteger numFrames = 0;
                                         8 * _image.elemSize(),                           // Bits per pixel
                                         _image.step[0],                                  // Bytes per row
                                         colorSpace,                                     // Colorspace
-                                        kCGImageAlphaNone | kCGBitmapByteOrderDefault,  // Bitmap info flags
+                                        kCGImageAlphaNoneSkipLast | kCGBitmapByteOrderDefault,  // Bitmap info flags
                                         provider,                                       // CGDataProviderRef
                                         NULL,                                           // Decode
                                         false,                                          // Should interpolate

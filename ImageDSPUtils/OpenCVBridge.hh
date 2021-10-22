@@ -36,8 +36,6 @@
 
 -(void)loadHaarCascadeWithFilename:(NSString*)filename;
 
--(bool)processFinger:(double *)R
-                    G:(double *)G
-                    B:(double *)B;
+-(bool)processFinger;
 
 @end

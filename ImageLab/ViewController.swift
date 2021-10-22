@@ -19,6 +19,7 @@ class ViewController: UIViewController {
 
     var timer = Timer()
     var timerToggle: Bool = false
+    var index = 0;
 
     @IBOutlet weak var cameraButton: UIButton!
     @IBOutlet weak var flashButton: UIButton!
@@ -61,25 +62,22 @@ class ViewController: UIViewController {
 
 
 
-        let result = self.bridge.processFinger()
+        let result = self.bridge.processFinger();
         let detected = Date()
-
         if result
         {
             // detected
             timeToTurnOff = detected.addingTimeInterval(1)
         }
-
+        
         if detected < timeToTurnOff
         {
             DispatchQueue.main.async() {
                 self.cameraButton.isEnabled = false
                 self.flashButton.isEnabled = false
-               
                 self.videoManager.turnOnFlashwithLevel(1.0)
             }
         }
-        
         else {
             DispatchQueue.main.async() {
                 self.cameraButton.isEnabled = true
@@ -88,6 +86,7 @@ class ViewController: UIViewController {
                 self.videoManager.turnOffFlash()
             }
         }
+        
 
 //        timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(test), userInfo: nil, repeats: true)
 //        timer.fire()
