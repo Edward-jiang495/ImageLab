@@ -22,10 +22,10 @@ using namespace cv;
 
 @implementation OpenCVBridge
 
-NSInteger numFrames = 0;
-NSMutableArray *r = [[NSMutableArray alloc] initWithCapacity:100];
-NSMutableArray *g = [[NSMutableArray alloc] initWithCapacity:100];
-NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:100];
+//NSInteger numFrames = 0;
+//NSMutableArray *r = [[NSMutableArray alloc] initWithCapacity:100];
+//NSMutableArray *g = [[NSMutableArray alloc] initWithCapacity:100];
+//NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:100];
 
 
 #pragma mark ===Write Your Code Here===
@@ -47,19 +47,19 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:100];
     
     cv::putText(_image, text, cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
     
-    if(numFrames >= 100){
-        cv::putText(_image, "100 Frames Captured", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
-    }
+//    if(numFrames >= 100){
+//        cv::putText(_image, "100 Frames Captured", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+//    }
     
     // if dark
     if (avgPixelIntensity.val[0] < 60 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 20)
     {
-        if(numFrames < 100){
-            numFrames += 1;
-            [r addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[0]]];
-            [g addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[1]]];
-            [b addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[2]]];
-        }
+//        if(numFrames < 100){
+//            numFrames += 1;
+//            [r addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[0]]];
+//            [g addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[1]]];
+//            [b addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[2]]];
+//        }
         
         return true;
     }
@@ -67,13 +67,13 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:100];
     // or if red
     else if (avgPixelIntensity.val[0] > 143 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 40)
     {
-        if(numFrames < 100){
-            numFrames += 1;
-            [r addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[0]]];
-            [g addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[1]]];
-            [b addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[2]]];
-
-        }
+//        if(numFrames < 100){
+//            numFrames += 1;
+//            [r addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[0]]];
+//            [g addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[1]]];
+//            [b addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[2]]];
+//
+//        }
                 
         return true;
     }
@@ -502,3 +502,4 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:100];
 
 
 @end
+
