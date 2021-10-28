@@ -16,6 +16,9 @@ class ModAViewController: UIViewController {
     var filtersEye : [CIFilter]! = nil
     var filtersMouth : [CIFilter]! = nil
     
+    @IBOutlet weak var hasSmile: UILabel!
+    
+    
     lazy var videoManager:VideoAnalgesic! = {
         let tmpManager = VideoAnalgesic(mainView: self.view)
         tmpManager.setCameraPosition(position: .front)
@@ -53,6 +56,8 @@ class ModAViewController: UIViewController {
     //MARK: ViewController Hierarchy
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        hasSmile.isHidden = true;
         
         self.view.backgroundColor = nil
         self.setupFilters()
@@ -98,6 +103,17 @@ class ModAViewController: UIViewController {
             //set where to apply filter
             filterCenter.x = f.bounds.midX
             filterCenter.y = f.bounds.midY
+            if f.hasSmile{
+                print("HAS SMILE ")
+                DispatchQueue.main.async {
+                    self.hasSmile.isHidden = false;
+                }
+            }
+            else{
+                DispatchQueue.main.async {
+                    self.hasSmile.isHidden = true;
+                }
+            }
             if f.hasLeftEyePosition{
                 for filt in filtersEye{
                     filt.setValue(retImage, forKey: kCIInputImageKey)
@@ -136,6 +152,8 @@ class ModAViewController: UIViewController {
 
                 
             }
+            
+         
             //do for each filter (assumes all filters have property, "inputCenter")
             for filt in filters{
                 filt.setValue(retImage, forKey: kCIInputImageKey)
@@ -149,7 +167,8 @@ class ModAViewController: UIViewController {
     
     func getFaces(img:CIImage) -> [CIFaceFeature]{
         // this ungodly mess makes sure the image is the correct orientation
-        let optsFace = [CIDetectorImageOrientation:self.videoManager.ciOrientation]
+        let optsFace = [CIDetectorImageOrientation:self.videoManager.ciOrientation, CIDetectorSmile: true] as [String : Any]
+//        let optsFace = [CIDetectorSmile: true]
         // get Face Features
         return self.detector.features(in: img, options: optsFace) as! [CIFaceFeature]
         
