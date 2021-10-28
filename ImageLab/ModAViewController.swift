@@ -69,21 +69,21 @@ class ModAViewController: UIViewController {
     func setupFilters(){
         filters = []
         
-        let filterPinch = CIFilter(name:"CIBumpDistortion")!
-        filterPinch.setValue(-0.5, forKey: "inputScale")
-        filterPinch.setValue(75, forKey: "inputRadius")
+        let filterPinch = CIFilter(name:"CIBumpDistortionLinear")!
+//        filterPinch.setValue(-0.5, forKey: "inputScale")
+//        filterPinch.setValue(75, forKey: "inputRadius")
         filters.append(filterPinch)
         
         filtersEye = []
-        let filtere = CIFilter(name: "CIBumpDistortionLinear")!
+        let filtere = CIFilter(name: "CITwirlDistortion")!
 //        filtere.setValue(-0.5, forKey: "inputScale")
-//        filtere.setValue(75, forKey: "inputRadius")
+        filtere.setValue(25, forKey: "inputRadius")
         filtersEye.append(filtere)
         
         filtersMouth = []
-        let filterm = CIFilter(name: "CIGlassDistortion")!
+        let filterm = CIFilter(name: "CIHoleDistortion")!
 //        filterm.setValue(-0.5, forKey: "inputScale")
-//        filterm.setValue(75, forKey: "inputRadius")
+        filterm.setValue(25, forKey: "inputRadius")
         filtersMouth.append(filterm)
         
         
