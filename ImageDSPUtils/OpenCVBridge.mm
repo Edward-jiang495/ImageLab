@@ -47,8 +47,11 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
     const int minThreshold = 130;//minimum threshold for a peak
     
     
-    std::vector<int> peaks;
+    double avgFramesPerBeat;
+
     
+    std::vector<int> peaks;
+//    NSLog(@"%@",r);
     //iterate through circular buffer r
     if(end > start){
         
@@ -76,10 +79,12 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
                 }
             }
         }
+        avgFramesPerBeat = (peaks[0] - peaks[numPeaks-1])/numPeaks;
     }
     //if the end is before the start
     else{
         //iterate from the end to 0
+        bool flippedPeaks = false;
         for(int i = end; i >= 0; i--){
             int maxIdx = 0;
             double maxVal = 0;
@@ -112,6 +117,7 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
                 middle += capacity;
             }
             if(maxIdx == middle){
+                flippedPeaks = true;
                 peaks.push_back(maxIdx);
                 numPeaks += 1;
                 if(numPeaks == numberOfPeaks){
@@ -143,17 +149,20 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
                 }
             }
         }
-        
+        if(flippedPeaks){
+            avgFramesPerBeat = (peaks[0] + capacity - peaks[numPeaks-1])/numPeaks;
+        }else{
+            avgFramesPerBeat = (peaks[0] - peaks[numPeaks-1])/numPeaks;
+        }
     }
     
     
     
     //get average number of frames between each peak
-    int avgFramesPerBeat = (peaks[0] - peaks[numPeaks-1])/numPeaks;
     
     //avgFramesPerBeat/24 gives you the the time it takes (in seconds) for one beat to occur
     //(1/timeForOneBeat(s)) * 60 will give you the number of beats per min
-    double bpm = (1/(avgFramesPerBeat/24)) * 60;
+    double bpm = (1.0/(avgFramesPerBeat/24.0)) * 60.0;
     
     NSLog(@"BPM: %f",bpm);
 }
@@ -195,7 +204,7 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
     cv::putText(_image, text, cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
     
     char bpmText[10];
-    sprintf(bpmText,"BPM: %.0f", bpm);
+    sprintf(bpmText,"BPM: %f", bpm);
     if(size == capacity){
         cv::putText(_image, bpmText, cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
 
