@@ -43,10 +43,7 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
     
     const int numberOfPeaks = 15;//number of prior peaks we are analyzing
     int numPeaks = 0;//increment var
-    /* If each be
-     *
-     */
-    const int windowSize = 7;//size of sliding window
+    const int windowSize = 10;//size of sliding window
     const int minThreshold = 130;//minimum threshold for a peak
     
     
@@ -197,29 +194,29 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
     
     cv::putText(_image, text, cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
     
+    char bpmText[10];
+    sprintf(bpmText,"BPM: %.0f", bpm);
     if(size == capacity){
-        cv::putText(_image, "100 Frames Captured", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
-        NSLog(@"%@",r);
-        NSLog(@"%@",g);
-        NSLog(@"%@",b);
+        cv::putText(_image, bpmText, cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
 
     }
     
+    //we shouldnt be storing values if it is dark
     // if dark
-    if (avgPixelIntensity.val[0] < 60 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 20)
-    {
-        [self updateData:&avgPixelIntensity];
-        if(calculateBPM){
-            [self calculateBPM];
-        }
-        
-        
-        
-        return true;
-    }
+//    if (avgPixelIntensity.val[0] < 60 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 20)
+//    {
+//        [self updateData:&avgPixelIntensity];
+//        if(calculateBPM){
+//            [self calculateBPM];
+//        }
+//
+//
+//
+//        return true;
+//    }
     
     // or if red
-    else if (avgPixelIntensity.val[0] > 130 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 40)
+    if (avgPixelIntensity.val[0] > 130 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 40)
     {
         
         [self updateData:&avgPixelIntensity];
@@ -243,8 +240,6 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
             r = [[NSMutableArray alloc] initWithCapacity:capacity];
             g = [[NSMutableArray alloc] initWithCapacity:capacity];
             b = [[NSMutableArray alloc] initWithCapacity:capacity];
-            
-            
         }
         
         return false;
