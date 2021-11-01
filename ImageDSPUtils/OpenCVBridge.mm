@@ -53,7 +53,7 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
     if(end > start){
         
         //iterate from the back to the front to find last n peaks
-        for(int i = end-1; i >= start + windowSize; i--){
+        for(int i = end; i >= start + windowSize; i--){
             int maxIdx = 0;
             double maxVal = 0;
             
