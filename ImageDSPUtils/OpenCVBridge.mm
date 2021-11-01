@@ -171,9 +171,9 @@ NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
     if(size == capacity){
         end = (end + 1) % capacity;
         start = (start + 1) % capacity;
-        [r insertObject:[NSNumber numberWithDouble:avgPixelIntensity->val[0]] atIndex:end];
-        [g insertObject:[NSNumber numberWithDouble:avgPixelIntensity->val[1]] atIndex:end];
-        [b insertObject:[NSNumber numberWithDouble:avgPixelIntensity->val[2]] atIndex:end];
+        [r replaceObjectAtIndex:end withObject:[NSNumber numberWithDouble:avgPixelIntensity->val[0]]];
+        [g replaceObjectAtIndex:end withObject:[NSNumber numberWithDouble:avgPixelIntensity->val[1]]];
+        [b replaceObjectAtIndex:end withObject:[NSNumber numberWithDouble:avgPixelIntensity->val[2]]];
     }else{
         [r addObject:[NSNumber numberWithDouble:avgPixelIntensity->val[0]]];
         [g addObject:[NSNumber numberWithDouble:avgPixelIntensity->val[1]]];
