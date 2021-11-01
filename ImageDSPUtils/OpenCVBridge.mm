@@ -18,18 +18,170 @@ using namespace cv;
 @property (nonatomic) CGAffineTransform transform;
 @property (nonatomic) CGAffineTransform inverseTransform;
 @property (atomic) cv::CascadeClassifier classifier;
+
+-(void)calculateBPM;
+-(void)updateData:(cv::Scalar *) avgPixelIntensity;
 @end
 
 @implementation OpenCVBridge
 
-//NSInteger numFrames = 0;
-//NSMutableArray *r = [[NSMutableArray alloc] initWithCapacity:100];
-//NSMutableArray *g = [[NSMutableArray alloc] initWithCapacity:100];
-//NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:100];
+NSInteger start = 0;
+NSInteger end = 0;
+NSInteger size = 0;
+NSInteger bpm = 0;
+NSInteger maxFloat = 0;
+NSInteger capacity = 375;//this in reality will be the value + 1
+bool calculateBPM = false;
+NSMutableArray *r = [[NSMutableArray alloc] initWithCapacity:capacity];
+NSMutableArray *g = [[NSMutableArray alloc] initWithCapacity:capacity];
+NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
 
 
 #pragma mark ===Write Your Code Here===
 // alternatively you can subclass this class and override the process image function
+-(void)calculateBPM{
+    
+    const int numberOfPeaks = 15;//number of prior peaks we are analyzing
+    int numPeaks = 0;//increment var
+    /* If each be
+     *
+     */
+    const int windowSize = 7;//size of sliding window
+    const int minThreshold = 130;//minimum threshold for a peak
+    
+    
+    std::vector<int> peaks;
+    
+    //iterate through circular buffer r
+    if(end > start){
+        
+        //iterate from the back to the front to find last n peaks
+        for(int i = end-1; i >= start + windowSize; i--){
+            int maxIdx = 0;
+            double maxVal = 0;
+            
+            //get max for sliding window
+            for(int j = i; j > i - windowSize; j--){
+                double val = [[r objectAtIndex:j] doubleValue];
+                if(val > minThreshold and maxVal < val){
+                    maxVal = val;
+                    maxIdx = j;
+                }
+            }
+            //if the max is in the middle add it to the peaks vector
+            if(maxIdx == i - (windowSize/2)){
+                peaks.push_back(maxIdx);
+                numPeaks += 1;
+                
+                //if we have found n number of peaks break the loop
+                if(numPeaks == numberOfPeaks){
+                    break;
+                }
+            }
+        }
+    }
+    //if the end is before the start
+    else{
+        //iterate from the end to 0
+        for(int i = end; i >= 0; i--){
+            int maxIdx = 0;
+            double maxVal = 0;
+            
+            //find max value for window size
+            for(int j = i; j > i - windowSize; j--){
+                double val;
+                int idx = j;
+                
+                //if j is less than 0 loop to the back of the buffer
+                if(j < 0){
+                    idx = capacity + j;
+                    val = [[r objectAtIndex:idx] doubleValue];
+                }else{
+                    val = [[r objectAtIndex:idx] doubleValue];
+                }
+                
+                
+                if(val > minThreshold and maxVal < val){
+                    maxVal = val;
+                    maxIdx = idx;
+                }
+            }
+            
+            //get the middle of the window
+            int middle = i - (windowSize/2);
+            
+            //if the middle of the window is less than 0 loop to the back of the buffer
+            if(middle < 0){
+                middle += capacity;
+            }
+            if(maxIdx == middle){
+                peaks.push_back(maxIdx);
+                numPeaks += 1;
+                if(numPeaks == numberOfPeaks){
+                    break;
+                }
+            }
+        }
+        
+        //loop from the back of the buffer to start + windowSize
+        //if we go all the way to start the window will leak into the newest data
+        for(int i = capacity-1; i >= start + windowSize; i--){
+            int maxIdx = 0;
+            double maxVal = 0;
+            //get max of window
+            for(int j = i; j >= i - windowSize; j--){
+                double val = [[r objectAtIndex:j] doubleValue];
+                if(val > minThreshold and maxVal < val){
+                    maxVal = val;
+                    maxIdx = j;
+                }
+            }
+            
+            //find if max is in the middle of the window
+            if(maxIdx == i - (windowSize/2)){
+                peaks.push_back(maxIdx);
+                numPeaks += 1;
+                if(numPeaks == numberOfPeaks){
+                    break;
+                }
+            }
+        }
+        
+    }
+    
+    
+    
+    //get average number of frames between each peak
+    int avgFramesPerBeat = (peaks[0] - peaks[numPeaks-1])/numPeaks;
+    
+    //avgFramesPerBeat/24 gives you the the time it takes (in seconds) for one beat to occur
+    //(1/timeForOneBeat(s)) * 60 will give you the number of beats per min
+    double bpm = (1/(avgFramesPerBeat/24)) * 60;
+    
+    NSLog(@"BPM: %f",bpm);
+}
+
+-(void)updateData:(cv::Scalar *) avgPixelIntensity{
+    if(size == capacity){
+        end = (end + 1) % capacity;
+        start = (start + 1) % capacity;
+        [r insertObject:[NSNumber numberWithDouble:avgPixelIntensity->val[0]] atIndex:end];
+        [g insertObject:[NSNumber numberWithDouble:avgPixelIntensity->val[1]] atIndex:end];
+        [b insertObject:[NSNumber numberWithDouble:avgPixelIntensity->val[2]] atIndex:end];
+    }else{
+        [r addObject:[NSNumber numberWithDouble:avgPixelIntensity->val[0]]];
+        [g addObject:[NSNumber numberWithDouble:avgPixelIntensity->val[1]]];
+        [b addObject:[NSNumber numberWithDouble:avgPixelIntensity->val[2]]];
+        if(size != 0){
+            end = (end + 1) % capacity;
+        }
+        size += 1;
+        if(size == capacity){
+            calculateBPM = true;
+        }
+    }
+}
+
 -(bool)processFinger{
 
     cv::Mat frame_gray,image_copy;
@@ -39,69 +191,64 @@ using namespace cv;
     cvtColor(_image, image_copy, CV_BGRA2BGR); // get rid of alpha for processing
     avgPixelIntensity = cv::mean( image_copy );
 
-    //    the original code was below
-    //    after testing with rgb table, the correct order should be egb not bgr
-    //    sprintf(text,"Avg. B: %.0f, G: %.0f, R: %.0f", avgPixelIntensity.val[0],avgPixelIntensity.val[1],avgPixelIntensity.val[2]);
+   
     sprintf(text,"Avg. R: %.0f, G: %.0f, B: %.0f", avgPixelIntensity.val[0], avgPixelIntensity.val[1], avgPixelIntensity.val[2]);
     
     
     cv::putText(_image, text, cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
     
-//    if(numFrames >= 100){
-//        cv::putText(_image, "100 Frames Captured", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
-//    }
+    if(size == capacity){
+        cv::putText(_image, "100 Frames Captured", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+        NSLog(@"%@",r);
+        NSLog(@"%@",g);
+        NSLog(@"%@",b);
+
+    }
     
     // if dark
     if (avgPixelIntensity.val[0] < 60 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 20)
     {
-//        if(numFrames < 100){
-//            numFrames += 1;
-//            [r addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[0]]];
-//            [g addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[1]]];
-//            [b addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[2]]];
-//        }
+        [self updateData:&avgPixelIntensity];
+        if(calculateBPM){
+            [self calculateBPM];
+        }
+        
+        
         
         return true;
     }
     
     // or if red
-    else if (avgPixelIntensity.val[0] > 143 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 40)
+    else if (avgPixelIntensity.val[0] > 130 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 40)
     {
-//        if(numFrames < 100){
-//            numFrames += 1;
-//            [r addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[0]]];
-//            [g addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[1]]];
-//            [b addObject:[NSNumber numberWithDouble:avgPixelIntensity.val[2]]];
-//
-//        }
-                
+        
+        [self updateData:&avgPixelIntensity];
+        if(calculateBPM){
+            [self calculateBPM];
+        }
+
         return true;
     }
     
     else
     {
+        
+        NSLog(@"Reset buffer");
+        //reset buffer only if needed
+        if(size != 0){
+            size = 0;
+            start = 0;
+            end = 0;
+            calculateBPM = false;
+            r = [[NSMutableArray alloc] initWithCapacity:capacity];
+            g = [[NSMutableArray alloc] initWithCapacity:capacity];
+            b = [[NSMutableArray alloc] initWithCapacity:capacity];
+            
+            
+        }
+        
         return false;
     }
-    
-//    if(avgPixelIntensity.val[0] > 40 && avgPixelIntensity.val[0] < 90){
-//        //data on a iphone 7, maybe different on different models
-//        cv::putText(_image, "finger", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
-//        return true;
-//
-//    }
-//    else if(avgPixelIntensity.val[0] > 240 && avgPixelIntensity.val[0] < 255){
-//        //data on a iphone 7, maybe different on different models
-//        cv::putText(_image, "finger", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
-//        return true;
-//
-//    }
-//
-//    else{
-//        cv::putText(_image, "no finger", cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
-//        return false;
-//
-//    }
-        
 }
 
 #pragma mark Define Custom Functions Here

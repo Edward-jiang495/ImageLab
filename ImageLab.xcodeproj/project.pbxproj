@@ -136,17 +136,16 @@
 				TargetAttributes = {
 					B650B3161D8340F0000114A1 = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = F69WJ27LN4;
+						DevelopmentTeam = 87NPWNTFX6;
 						LastSwiftMigration = 1200;
 					};
 				};
 			};
 			buildConfigurationList = B650B3121D8340F0000114A1 /* Build configuration list for PBXProject "ImageLab" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
@@ -327,7 +326,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = F69WJ27LN4;
+				DEVELOPMENT_TEAM = 87NPWNTFX6;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -349,7 +348,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = F69WJ27LN4;
+				DEVELOPMENT_TEAM = 87NPWNTFX6;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
