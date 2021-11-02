@@ -28,16 +28,15 @@ using namespace cv;
 @implementation OpenCVBridge
 
 NSInteger capacity = 240;
-
-NSMutableArray *r = [[NSMutableArray alloc] initWithCapacity:capacity];
-NSMutableArray *g = [[NSMutableArray alloc] initWithCapacity:capacity];
-NSMutableArray *b = [[NSMutableArray alloc] initWithCapacity:capacity];
+NSString *statusText = [[NSString alloc] initWithUTF8String:""];
+NSString *bpmText = [[NSString alloc] initWithUTF8String:""];
 
 CircularQueue *redValues = [[CircularQueue alloc] initWithCapacity:capacity];
 
 #pragma mark ===Write Your Code Here===
 
 - (void)calculateBPM {
+    statusText = @"Calculating BPM...";
     
     const int ignoredFrames = 50;
     
@@ -117,14 +116,15 @@ CircularQueue *redValues = [[CircularQueue alloc] initWithCapacity:capacity];
     double avgFramesPerBeat = (avgFramesPerMinPeak + avgFramesPerMaxPeak) / 2.0;
     
     double bpm = (1.0 / (avgFramesPerBeat / 24.0)) * 60.0;
-    
-    NSLog(@"BPM: %lf", bpm);
+    bpmText = [NSString stringWithFormat:@"BPM: %lf", bpm];
     
     NSLog(@"Reset Buffer");
     [redValues removeAllObjects];
 }
 
 - (void)updateData:(cv::Scalar *)avgPixelIntensity {
+    
+    statusText = @"Recording data...";
     
     NSNumber *value = [[NSNumber alloc] initWithDouble:avgPixelIntensity->val[0]];
     [redValues enqObject:value];
@@ -140,7 +140,6 @@ CircularQueue *redValues = [[CircularQueue alloc] initWithCapacity:capacity];
 - (bool)processFinger {
     
     cv::Mat frame_gray, image_copy;
-    char text[50];
     Scalar avgPixelIntensity;
     
     // get rid of alpha for processing
@@ -149,23 +148,21 @@ CircularQueue *redValues = [[CircularQueue alloc] initWithCapacity:capacity];
     // calculate averages
     avgPixelIntensity = cv::mean(image_copy);
     
-    // print color information
-    sprintf(text, "Avg. R: %.0f, G: %.0f, B: %.0f", avgPixelIntensity.val[0], avgPixelIntensity.val[1], avgPixelIntensity.val[2]);
+    // create color info string
+    char text[50];
+    sprintf(text, "Avg. Red: %.0f", avgPixelIntensity.val[0]);
+    
+    // display information / statuses on screen
     cv::putText(_image, text, cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
-    
-    //    char bpmText[10];
-    
-    //    sprintf(bpmText, "BPM: %f", bpm);
-    //    if (size == capacity) {
-    //        cv::putText(_image, bpmText, cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
-    //    }
-    
+    cv::putText(_image, std::string([statusText UTF8String]), cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+    cv::putText(_image, std::string([bpmText UTF8String]), cv::Point(50, 120), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
     
     if (avgPixelIntensity.val[0] < 60 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 20)
     {
         if (redValues.count > 0)
         {
             NSLog(@"Reset Buffer");
+            statusText = @"Reset Buffer";
             [redValues removeAllObjects];
         }
         
@@ -185,6 +182,7 @@ CircularQueue *redValues = [[CircularQueue alloc] initWithCapacity:capacity];
         if (redValues.count > 0)
         {
             NSLog(@"Reset Buffer");
+            statusText = @"Reset Buffer";
             [redValues removeAllObjects];
         }
         
