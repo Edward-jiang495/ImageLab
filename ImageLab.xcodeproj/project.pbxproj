@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8E88230727224760003EF930 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 8E88230627224760003EF930 /* README.md */; };
+		8E9B43282730CD2E00BFBA55 /* CircularQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E9B43272730CD2E00BFBA55 /* CircularQueue.m */; };
 		AB9D6B10272B1D6D006AFD57 /* ModAViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9D6B0F272B1D6D006AFD57 /* ModAViewController.swift */; };
 		AB9D6B12272B1D71006AFD57 /* ModBViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB9D6B11272B1D71006AFD57 /* ModBViewController.swift */; };
 		B650B31B1D8340F0000114A1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B650B31A1D8340F0000114A1 /* AppDelegate.swift */; };
@@ -24,6 +25,8 @@
 
 /* Begin PBXFileReference section */
 		8E88230627224760003EF930 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		8E9B43262730CD2E00BFBA55 /* CircularQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CircularQueue.h; path = ImageDSPUtils/CircularQueue.h; sourceTree = SOURCE_ROOT; };
+		8E9B43272730CD2E00BFBA55 /* CircularQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CircularQueue.m; path = ImageDSPUtils/CircularQueue.m; sourceTree = SOURCE_ROOT; };
 		AB9D6B0F272B1D6D006AFD57 /* ModAViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModAViewController.swift; sourceTree = "<group>"; };
 		AB9D6B11272B1D71006AFD57 /* ModBViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModBViewController.swift; sourceTree = "<group>"; };
 		B650B3171D8340F0000114A1 /* ImageLab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -99,6 +102,8 @@
 				B67B72B91D996ADE008EDDE1 /* OpenCVBridge.hh */,
 				B67B72BA1D996ADE008EDDE1 /* OpenCVBridge.mm */,
 				B67B72B81D996ADC008EDDE1 /* ImageLab-Bridging-Header.h */,
+				8E9B43262730CD2E00BFBA55 /* CircularQueue.h */,
+				8E9B43272730CD2E00BFBA55 /* CircularQueue.m */,
 			);
 			name = ImageDSPUtils;
 			path = ImageLab;
@@ -136,7 +141,7 @@
 				TargetAttributes = {
 					B650B3161D8340F0000114A1 = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = 87NPWNTFX6;
+						DevelopmentTeam = F69WJ27LN4;
 						LastSwiftMigration = 1200;
 					};
 				};
@@ -183,6 +188,7 @@
 				B6E657991D95AA4500E75C60 /* VideoAnalgesic.swift in Sources */,
 				B650B31D1D8340F0000114A1 /* ViewController.swift in Sources */,
 				AB9D6B12272B1D71006AFD57 /* ModBViewController.swift in Sources */,
+				8E9B43282730CD2E00BFBA55 /* CircularQueue.m in Sources */,
 				B650B31B1D8340F0000114A1 /* AppDelegate.swift in Sources */,
 				AB9D6B10272B1D6D006AFD57 /* ModAViewController.swift in Sources */,
 				B67B72BB1D996ADE008EDDE1 /* OpenCVBridge.mm in Sources */,
@@ -326,7 +332,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = 87NPWNTFX6;
+				DEVELOPMENT_TEAM = F69WJ27LN4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -348,7 +354,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				DEVELOPMENT_TEAM = 87NPWNTFX6;
+				DEVELOPMENT_TEAM = F69WJ27LN4;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

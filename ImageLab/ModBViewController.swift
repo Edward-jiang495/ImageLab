@@ -35,7 +35,7 @@ class ModBViewController: UIViewController {
     
     func processImageSwift(inputImage:CIImage) -> CIImage{
         //do i need to deallocate video analegsic
-        self.videoManager.turnOnFlashwithLevel(0.5)
+        self.videoManager.turnOnFlashwithLevel(0.3)
 
         var retImage = inputImage
         self.bridge.setTransforms(self.videoManager.transform)
