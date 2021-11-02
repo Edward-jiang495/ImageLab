@@ -39,38 +39,25 @@ CircularQueue *redValues = [[CircularQueue alloc] initWithCapacity:capacity];
 
 - (void)calculateBPM {
     
+    const int ignoredFrames = 50;
+    
     // sliding window size
-    const int windowSize = 10;
+    const int windowSize = 12;
     
-    std::vector<int> peaks;
+    // peaks to count at end of buffer
+    const int peaksToCount = 5;
     
-    // find minimum and maximum value in buffer
-    double minValue = 257;
-    double maxValue = -1;
-    
-    for (int i = 0; i < redValues.count; ++i)
-    {
-        double value = [[redValues objectAtIndex:i] doubleValue];
-        
-        if (value > maxValue)
-        {
-            maxValue = value;
-        }
-        
-        if (value < minValue)
-        {
-            minValue = value;
-        }
-    }
-    
-    // set threshold
-    const double redThreshold = minValue + (maxValue - minValue) * 0.25;
+    std::vector<int> minPeaks;
+    std::vector<int> maxPeaks;
     
     // sliding window
-    for (int windowLeft = 0; windowLeft < redValues.count - windowSize; ++windowLeft) {
+    for (int windowLeft = ignoredFrames; windowLeft < redValues.count - windowSize; ++windowLeft) {
         
         double minWindowValue = 257;
         int minWindowIndex = -1;
+        
+        double maxWindowValue = -1;
+        int maxWindowIndex = -1;
         
         // window min finding
         for (int i = windowLeft; i < windowLeft + windowSize; ++i) {
@@ -79,26 +66,62 @@ CircularQueue *redValues = [[CircularQueue alloc] initWithCapacity:capacity];
             double value = [[redValues objectAtIndex:i] doubleValue];
             
             // ensure we are finding true peaks by filtering values not satisfying threshold
-            if (value < redThreshold && value < minWindowValue) {
+            // min
+//          if (value < redMinThreshold && value < minWindowValue) {
+            if (value < minWindowValue) {
                 minWindowValue = value;
                 minWindowIndex = i;
+            }
+            
+            // max
+//          if (value > redMaxThreshold && value > maxWindowValue)
+            if (value > maxWindowValue)
+            {
+                maxWindowValue = value;
+                maxWindowIndex = i;
             }
         }
         
         // if we found a minimum in center of window
         if (minWindowIndex - windowLeft == windowSize / 2) {
-            peaks.push_back(minWindowIndex);
+            minPeaks.push_back(minWindowIndex);
+        }
+        
+        // if we found a maximum in center of window
+        if (maxWindowIndex - windowLeft == windowSize / 2)
+        {
+            maxPeaks.push_back(maxWindowIndex);
         }
     }
     
-    // calculate if we found peaks
-    if (peaks.size() > 0)
+    // if we didn't find at least 5 peaks, wait until next cycle to try again.
+    if (minPeaks.size() < peaksToCount || maxPeaks.size() < peaksToCount)
     {
-        double avgFramesPerBeat = static_cast<double>(peaks.back() - peaks.front()) / peaks.size();
-        double bpm = (1.0 / (avgFramesPerBeat / 24.0)) * 60.0;
-        
-        NSLog(@"BPM: %lf\trange: %lf", bpm, maxValue - minValue);
+        return;
     }
+    
+    double avgFramesPerMinPeak = -1;
+    double avgFramesPerMaxPeak = -1;
+    
+    // calculate if we found peaks, using last 5 peaks detected
+    if (minPeaks.size() > 0)
+    {
+        avgFramesPerMinPeak = static_cast<double>(minPeaks[minPeaks.size() - 1] - minPeaks[minPeaks.size() - peaksToCount - 1]) / static_cast<double>(peaksToCount);
+    }
+    
+    if (maxPeaks.size() > 0)
+    {
+        avgFramesPerMaxPeak = static_cast<double>(maxPeaks[maxPeaks.size() - 1] - maxPeaks[maxPeaks.size() - peaksToCount - 1]) / static_cast<double>(peaksToCount);
+    }
+    
+    double avgFramesPerBeat = (avgFramesPerMinPeak + avgFramesPerMaxPeak) / 2.0;
+    
+    double bpm = (1.0 / (avgFramesPerBeat / 24.0)) * 60.0;
+    
+    NSLog(@"BPM: %lf", bpm);
+    
+    NSLog(@"Reset Buffer");
+    [redValues removeAllObjects];
 }
 
 - (void)updateData:(cv::Scalar *)avgPixelIntensity {
@@ -107,6 +130,7 @@ CircularQueue *redValues = [[CircularQueue alloc] initWithCapacity:capacity];
     [redValues enqObject:value];
     
     // calculate BPM when buffer is full
+    // and then reset the buffer for next calculation
     if (redValues.count == redValues.capacity)
     {
         [self calculateBPM];
