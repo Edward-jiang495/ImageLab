@@ -150,10 +150,9 @@ CircularQueue *redValues = [[CircularQueue alloc] initWithCapacity:capacity];
     
     // create color info string
     char text[50];
-    sprintf(text, "Avg. Red: %.0f", avgPixelIntensity.val[0]);
-    
+    sprintf(text, "Red: %.0f Green: %.0f Blue: %.0f", avgPixelIntensity.val[0], avgPixelIntensity.val[1], avgPixelIntensity.val[2]);
     // display information / statuses on screen
-    cv::putText(_image, text, cv::Point(50, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
+    cv::putText(_image, text, cv::Point(0, 50), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
     cv::putText(_image, std::string([statusText UTF8String]), cv::Point(50, 100), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
     cv::putText(_image, std::string([bpmText UTF8String]), cv::Point(50, 120), FONT_HERSHEY_PLAIN, 0.75, Scalar::all(255), 1, 2);
     
@@ -165,12 +164,12 @@ CircularQueue *redValues = [[CircularQueue alloc] initWithCapacity:capacity];
             statusText = @"Reset Buffer";
             [redValues removeAllObjects];
         }
-        
+
         return true;
     }
     
     // or if red
-    if (avgPixelIntensity.val[0] > 130 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 40) {
+    if (avgPixelIntensity.val[0] > 130 && avgPixelIntensity.val[1] < 20 && avgPixelIntensity.val[2] < 70) {
         
         [self updateData:&avgPixelIntensity];
         
